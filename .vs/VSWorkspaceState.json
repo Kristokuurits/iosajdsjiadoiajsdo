@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\teamtrack-api",
+    "\\teamtrack-frontend",
+    "\\teamtrack-frontend\\src",
+    "\\teamtrack-frontend\\src\\components",
+    "\\teamtrack-frontend\\src\\models",
+    "\\teamtrack-frontend\\src\\router",
+    "\\teamtrack-frontend\\src\\stores"
+  ],
+  "PreviewInSolutionExplorer": false
+}
