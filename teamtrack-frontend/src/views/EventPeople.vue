@@ -1,6 +1,6 @@
 <template>
     <navbar />
-    <EventList :title="title" />
+    <EventList :title="title" :isAthlete="isAthlete" />
 </template>
 
 <script setup lang="ts">

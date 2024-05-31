@@ -56,7 +56,7 @@ export const usePeopleStore = defineStore('peopleStore', () => {
             load();
         }
     };
-
+    
 
     const deletePeopleList = async (peopleList: People) => {
         const deletePeopleListRequest = useApiRawRequest(`people/${peopleList.id}`, {

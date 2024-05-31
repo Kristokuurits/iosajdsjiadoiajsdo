@@ -1,195 +1,266 @@
 <template>
     <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 text-black">
-        <div class="text-center">
-            <h1 class="font-bold">{{ title }}</h1>
-            <DataTable :value="peopleLists" v-if="peopleLists.length > 0">
-                <Column field="type" header="Nimetus" />
-                <Column field="date" header="Kuupäev" />
-                <Column field="time" header="Kellaaeg" />
-                <Column field="Id" header="Id" />
-                <Column v-if="!isAthlete">
-                </Column>
-            </DataTable>
-            <div v-else>Sündmused puuduvad</div>
+      <div class="text-center">
+        <h1 class="font-bold"> Inimesed </h1>
+        <DataTable :value="peopleLists" v-if="peopleLists.length > 0">
+          <Column field="id" header="Id"></Column>
+          <Column field="username" header="Nimi"></Column>
+          <Column field="email" header="Email"></Column>
+          <Column v-if="!isAthlete" header="Actions">
+            <template #body="slotProps">
+              <button class="btn btn-red" @click="remove(slotProps.data)">Delete</button>
+            </template>
+          </Column>
+        </DataTable>
+        <div v-else>Sündmused puuduvad</div>
+      </div>
+      <div v-if="showPopup" class="popup">
+        <div class="popup-inner">
+          <h2>PeopleList</h2>
+          <ul>
+            <li v-for="(value, key) in selectedPeopleList" :key="key">
+              {{ key }}: {{ value }}
+            </li>
+          </ul>
+          <button @click="showPopup = false" class="popup-close">X</button>
         </div>
-        <div v-if="showPopup" class="popup">
-            <div class="popup-inner">
-                <h2>PeopleList</h2>
-                <ul>
-                    <li v-for="(value, key) in selectedPeopleList" :key="key">
-                        {{ key }}: {{ value }}
-                    </li>
-                </ul>
-                <button @click="showPopup = false" class="popup-close">X</button>
-            </div>
-        </div>
+      </div>
     </div>
-</template>
-
-<script setup lang="ts">
-    import { People } from '@/models/People';
-    import { usePeopleStore } from "@/stores/peopleStore";
-    import { storeToRefs } from "pinia";
-    import { defineProps, onMounted, ref, watch } from "vue";
-    import { useRoute } from "vue-router";
-
-    const route = useRoute();
-
-    watch(route, (to, from) => {
-        if (to.path !== from.path || to.query !== from.query) {
-            peopleStore.load();
-        }
-    }, { deep: true });
-
-    defineProps<{ title: string, isAthlete: boolean }>();
-
-    const showPopup = ref(false);
-    const selectedPeopleList = ref({});
-
-    const showDetails = (people: People) => {
-        selectedPeopleList.value = people;
-        showPopup.value = true;
-    };
-
-    const peopleStore = usePeopleStore();
-    const { peopleLists } = storeToRefs(peopleStore);
-
-    onMounted(() => {
-        peopleStore.load();
-    });
-
-    const remove = (people: People) => {
-        people.deletePeopleList(people);
-    };
-</script>
-
-<style scoped>
-    /* General styles */
+  </template>
+  
+  <script setup lang="ts">
+  import { defineProps, onMounted, ref, watch } from 'vue';
+  import { useRoute } from 'vue-router';
+  import { usePeopleStore } from '@/stores/peopleStore';
+  import { storeToRefs } from 'pinia';
+  import { People } from '@/models/People';
+  
+  const route = useRoute();
+  
+  const { title, isAthlete } = defineProps<{
+    title: string;
+    isAthlete: boolean;
+  }>();
+  
+  const showPopup = ref(false);
+  const selectedPeopleList = ref({});
+  
+  const showDetails = (people: People) => {
+    selectedPeopleList.value = people;
+    showPopup.value = true;
+  };
+  
+  const peopleStore = usePeopleStore();
+  const { peopleLists } = storeToRefs(peopleStore);
+  
+  onMounted(() => {
+    peopleStore.load();
+  });
+  
+  watch(route, (to, from) => {
+    if (to.path !== from.path || to.query !== from.query) {
+      peopleStore.load();
+    }
+  }, { deep: true });
+  
+  const remove = (people: People) => {
+    peopleStore.deletePeopleList(people);
+  };
+  </script>
+  
+  <style scoped>
     .min-h-screen {
-        background-color: #888888;
-        color: #111827;
+        background-color: rgb(136, 136, 136);
+        color: #111827; 
     }
 
+
+    .ring {
+        color: rgb(212, 255, 111);
+    }
+
+        .ring:hover {
+            animation: colorchange1 1s infinite;
+        }
+
+    .delete {
+        font-weight: bold;
+        color: white;
+        background-color: rgb(255, 0, 0);
+        padding: 0.00000005rem 0.5rem;
+    }
+
+        .delete:hover {
+            animation: colorchange2 1s infinite;
+        }
+
+    .details {
+        font-weight: bold;
+        color: white;
+        background-color: rgb(149, 225, 238);
+        padding: 0.00000005rem 0.5rem;
+    }
+
+        .details:hover {
+            animation: colorchange3 1s infinite;
+        }
+
     h1 {
-        padding: 1rem 0;
+        padding: 1rem 0; 
         font-size: 2.25rem;
         line-height: 2.5rem;
         margin-bottom: 2rem;
-        color: rgb(0, 0, 0);
     }
 
-    /* Buttons and links */
-    .btn {
-        padding: 0.5rem 1rem;
-        margin: 0 0.25rem;
-        border: none;
-        font-weight: 600;
-        transition: background-color 0.3s;
+
+    button, .router-link {
+        padding: 0.5rem 1rem; 
+        margin: 0 0.25rem; 
+        border: none; 
+        font-weight: 600; 
+        transition: background-color 0.3s; 
     }
 
-    .btn-blue {
-        background-color: #4a96b9;
-        color: #fff;
-    }
+        button:hover, .router-link:hover {
+            background-color: darken(bg-color, 10%); 
+        }
 
-    .btn-red {
-        background-color: #ca6969;
-        color: #fff;
-    }
-
-    .btn-green {
-        background-color: #4dbb96;
-        color: #fff;
-    }
-
-    .btn:hover {
-        filter: brightness(0.9);
-    }
-
-    /* Popup styles */
     .popup {
-        display: flex;
+
+        display: flex; 
         align-items: center;
         justify-content: center;
-        transition: opacity 0.3s ease-in-out;
-        z-index: 100;
+        transition: opacity 0.3s ease-in-out; 
+        z-index: 100; 
     }
 
     .popup-inner {
-        background-color: #fff;
-        padding: 40px;
-        border-radius: 15px;
+        background-color: rgb(76, 202, 76); 
+        padding: 40px; 
+        border-radius: 15px; 
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        position: relative;
+        position: relative; 
         width: 90%;
-        max-width: 500px;
-        transition: transform 0.3s ease-in-out;
-        transform: scale(1.05);
+        max-width: 500px; 
+        transition: transform 1.3s ease-in-out; 
+        transform: scale(1.05); 
     }
 
-    .popup-inner h2 {
-        margin-top: 0;
-        margin-bottom: 1rem;
-        color: rgb(156, 156, 156);
-        font-size: 1.75rem;
-    }
+        .popup-inner h2 {
+            margin-top: 0; 
+            margin-bottom: 1rem; 
+            color: #333; 
+            font-size: 1.75rem; 
+        }
 
-    .popup-inner ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
+        .popup-inner ul {
+            list-style: none; 
+            padding: 0; 
+            margin: 0; 
+        }
 
-    .popup-inner ul li {
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #eee;
-    }
+            .popup-inner ul li {
+                padding: 0.5rem 0; 
+                border-bottom: 1px solid #eee;
+            }
 
-    .popup-inner ul li:last-child {
-        border-bottom: none;
-    }
+                .popup-inner ul li:last-child {
+                    border-bottom: none; 
+                }
 
-    .popup-close {
+    .popupClose {
         position: absolute;
         top: 10px;
         right: 10px;
-        width: 30px;
+        width: 30px; 
         height: 30px;
-        line-height: 30px;
-        text-align: center;
-        border-radius: 50%;
-        font-size: 16px;
+        line-height: 30px; 
+        text-align: center; 
+        border-radius: 50%; 
+        font-size: 16px; 
         transition: background-color 0.2s, transform 0.2s;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
+        display: flex; /* Use flexbox to center content */
+        align-items: center; /* Center vertically */
+        justify-content: center; /* Center horizontally */
+        padding: 0; /* Remove padding to prevent misalignment */
     }
 
-    .popup-close:hover,
-    .popup-close:focus {
-        background-color: #e11d48;
-        color: #fff;
-        outline: none;
+        .popupClose:hover,
+        .popupClose:focus {
+            animation: colorchange 1s infinite; /* Darker shade for hover effect */
+            outline: none; /* Remove outline on focus for a cleaner look */
+        }
+
+    /* Showing and hiding the popup */
+    .popup-enter-active, .popup-leave-active {
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .popup-enter, .popup-leave-to /* .popup-leave-active below version 2.1.8 */ {
+        opacity: 0;
+        transform: scale(1);
     }
 
     /* DataTable styling */
     .DataTable {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
+        /* Assuming you have a custom class to target */
+        width: 100%; /* Full width */
+        border-collapse: collapse; /* Collapsed borders for a clean look */
+        margin-top: 1rem; /* Space above the table */
     }
 
     .Column {
-        text-align: left;
-        padding: 0.75rem 1rem;
+        /* Assuming custom classnames for Column */
+        text-align: right; /* Align text to the left for readability */
+        padding: 0.75rem 1rem; /* Padding within cells */
     }
 
     /* Media queries for responsiveness */
     @media (min-width: 768px) {
         .min-h-screen {
-            padding: 2rem;
+            padding: 2rem; /* More padding on larger screens */
         }
     }
-</style>
+
+    @keyframes colorchange {
+        0% {
+            color: red;
+        }
+
+        100% {
+            color: rgb(76, 202, 76);
+        }
+    }
+
+    @keyframes colorchange1 {
+        0% {
+            color: blue
+        }
+
+        100% {
+            color: lightskyblue
+        }
+    }
+
+    @keyframes colorchange2 {
+        0% {
+            color: red
+        }
+
+        100% {
+            color: white;
+        }
+    }
+
+    @keyframes colorchange3 {
+        0% {
+            color: rgb(37, 179, 37)
+        }
+
+        100% {
+            color: white;
+        }
+    }
+  </style>
+  

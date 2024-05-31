@@ -1,4 +1,5 @@
 export interface People {
+deletePeopleList(people: People): unknown;
     id: Number;
     username: String;
     email: String;

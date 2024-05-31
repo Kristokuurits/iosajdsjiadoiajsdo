@@ -3,82 +3,82 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 import useApi, { useApiRawRequest } from "@/models/api";
 
-export const useEventStore = defineStore('eventPeopleStore', () => {
-    const apiGetEvents = useApi<EventPeople[]>('eventPeople');
-    const events = ref<EventPeople[]>([]);
-    let allEvents: EventPeople[] = [];
+export const useEventPeopleStore = defineStore('eventPeopleStore', () => {
+  const apiGetEventPeople = useApi<EventPeople[]>('eventPeople');
+  const eventPeople = ref<EventPeople[]>([]);
+  let allEventPeople: EventPeople[] = [];
 
-    const loadEvents = async () => {
-        await apiGetEvents.request();
+  const loadEventPeople = async () => {
+    await apiGetEventPeople.request();
 
-        if (apiGetEvents.response.value) {
-            return apiGetEvents.response.value;
-        }
-        return [];
-    };
+    if (apiGetEventPeople.response.value) {
+      return apiGetEventPeople.response.value;
+    }
+    return [];
+  };
 
-    const load = async () => {
-        allEvents = await loadEvents();
-        events.value = allEvents;
-    };
-    const getEventPeopleById = (id: number) => {
-        return allEvents.find((event) => event.id === id);
-    };
-
-
-    const addEventPeople = async (event: EventPeople) => {
-        const apiAddEventPeople = useApi<EventPeople>('events', {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(event),
-        });
-
-        await apiAddEventPeople.request();
-        if (apiAddEventPeople.response.value) {
-            load();
-        }
-    };
-    const updateEventPeople = async (event: EventPeople) => {
-        const apiUpdateEventPeople = useApi<EventPeople>('events/' + event.id, {
-            method: 'PUT',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(event),
-        });
-
-        await apiUpdateEventPeople.request();
-        if (apiUpdateEventPeople.response.value) {
-            load();
-        }
-    };
+  const load = async () => {
+    allEventPeople = await loadEventPeople();
+    eventPeople.value = allEventPeople;
+  };
+  const getEventPeopleById = (id: number) => {
+    return allEventPeople.find((eventpeople) => eventpeople.id === id);
+  };
 
 
-    const deleteEventPeople = async (event: EventPeople) => {
-        const deleteEventRequest = useApiRawRequest(`events/${event.id}`, {
-            method: 'DELETE',
-        });
+  const addEventPeople = async (eventpeople: EventPeople) => {
+    const apiAddEventPeople = useApi<EventPeople>('eventPeople', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(eventpeople),
+    }); 
+    
+    await apiAddEventPeople.request();
+    if (apiAddEventPeople.response.value) {
+      load();      
+    }
+  };
+  const updateEventPeople = async (eventpeople: EventPeople) => {
+    const apiUpdateEventPeople = useApi<EventPeople>('eventPeople/' + eventpeople.id, {
+      method: 'PUT',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(eventpeople),
+    });
 
-        const res = await deleteEventRequest();
+    await apiUpdateEventPeople.request();
+    if (apiUpdateEventPeople.response.value) {
+      load();
+    }    
+  };
 
-        if (res.status === 204) {
-            let id = events.value.indexOf(event);
 
-            if (id !== -1) {
-                events.value.splice(id, 1);
-            }
+  const deleteEventPeople = async (eventpeople: EventPeople) => {
+    const deleteEventPeopleRequest = useApiRawRequest(`eventPeople/${eventpeople.id}`, {
+      method: 'DELETE',
+    });
 
-            id = events.value.indexOf(event);
+    const res = await deleteEventPeopleRequest();
 
-            if (id !== -1) {
-                events.value.splice(id, 1);
-            }
-        }
-    };
+    if (res.status === 204) {
+      let id = eventPeople.value.indexOf(eventpeople);
 
-    return { events, load, getEventPeopleById, addEventPeople, updateEventPeople, deleteEventPeople };
+      if (id !== -1) {
+        eventPeople.value.splice(id, 1);
+      }
+
+      id = eventPeople.value.indexOf(eventpeople);
+
+      if (id !== -1) {
+        eventPeople.value.splice(id, 1);
+      }
+    }
+  };
+
+  return { eventPeople, load, getEventPeopleById, addEventPeople, updateEventPeople, deleteEventPeople };
 });

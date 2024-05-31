@@ -22,7 +22,7 @@
         list-style-type: none;
         margin: 0 auto;
         padding: 0;
-        width: 319px;
+        width: 426px;
         background-color: rgb(100, 100, 100);
         padding: 20px 0;
     }

@@ -27,8 +27,8 @@
               </button>
               <div x-show="isOpen" class="absolute z-10 mt-2 w-48 bg-white rounded-md shadow-lg">
                 <a href="/PeopleList" data-id="1" class="block px-4 py-2 text-sm hover:bg-gray-300">Link 1 </a>
-                <a href="/peopleStore" data-id="2" class="block px-4 py-2 text-sm hover:bg-gray-300">Link 2 </a>
-                <a href="/peopleStore" data-id="3" class="block px-4 py-2 text-sm hover:bg-gray-300">Link 3 </a>
+                <a href="/PeopleList" data-id="2" class="block px-4 py-2 text-sm hover:bg-gray-300">Link 2 </a>
+                <a href="/PeopleList" data-id="3" class="block px-4 py-2 text-sm hover:bg-gray-300">Link 3 </a>
               </div>
             </div>
           </div>

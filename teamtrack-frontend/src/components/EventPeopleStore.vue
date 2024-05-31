@@ -1,71 +1,57 @@
 <template>
     <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 text-black">
         <div class="text-center">
-            <h1 class="font-bold">{{ title }}</h1>
-            <DataTable :value="EventPeople" v-if="EventPeople.length > 0">
-                <Column field="type" header="Nimetus" />
-                <Column field="date" header="Kuupäev" />
-                <Column field="time" header="Kellaaeg" />
-                <Column field="Id" header="Id" />
-                <Column v-if="!isAthlete">
-                </Column>
-            </DataTable>
+            <h1 class="font-bold"> Inimeste Sündmused </h1>
+          <DataTable :value="combinedData" v-if="combinedData.length > 0">
+              <Column field="id" header="ID" />
+              <Column field="location" header="Location" />
+              <Column field="username" header="Person Name" />
+          </DataTable>
             <div v-else>Sündmused puuduvad</div>
         </div>
-        <div v-if="showPopup" class="popup">
-            <div class="popup-inner">
-                <h2>EventPeople</h2>
-                <ul>
-                    <li v-for="(value, key) in selectedEventPeople" :key="key">
-                        {{ key }}: {{ value }}
-                    </li>
-                </ul>
-                <button @click="showPopup = false" class="popup-close">X</button>
-            </div>
         </div>
-    </div>
 </template>
 
 <script setup lang="ts">
-    import { eventPeople } from '@/models/eventPeople';
-    import { useEventPeopleStore } from "@/stores/eventPeopleStore";
-    import { storeToRefs } from "pinia";
-    import { defineProps, onMounted, ref, watch } from "vue";
-    import { useRoute } from "vue-router";
 
-    const route = useRoute();
+import { useEventPeopleStore } from "@/stores/eventPeopleStore";
+import { usePeopleStore } from "@/stores/peopleStore";
+import { useEventsStore } from "@/stores/eventsStore";
+import { storeToRefs } from "pinia";
+import { onMounted, computed } from "vue";
 
-    watch(route, (to, from) => {
-        if (to.path !== from.path || to.query !== from.query) {
-            EventPeopleStore.load();
-        }
-    }, { deep: true });
 
-    defineProps<{ title: string, isAthlete: boolean }>();
+const eventPeopleStore = useEventPeopleStore();
+const peopleStore = usePeopleStore();
+const eventsStore = useEventsStore();
+const { eventPeople } = storeToRefs(eventPeopleStore);
+const { peopleLists } = storeToRefs(peopleStore);
+const { events } = storeToRefs(eventsStore);
 
-    const showPopup = ref(false);
-    const selectedEventPeople = ref({});
+onMounted(() => {
+  eventPeopleStore.load();
+  peopleStore.load();
+  eventsStore.load();
+});
 
-    const showDetails = (event: Event) => {
-        selectedEventPeople.value = event;
-        showPopup.value = true;
+
+
+const combinedData = computed(() => {
+  return eventPeople.value.map(ep => {
+    const event = events.value.find(e => e.id === ep.eventid);
+    const person = peopleLists.value.find(p => p.id === ep.personid);
+    return {
+      id: ep.id,
+      location: event ? event.location : 'Unknown Location',
+      username: person ? person.username : 'Unknown Person',
     };
-
-    const EventPeopleStore = useEventPeopleStore();
-    const { events } = storeToRefs(EventPeopleStore);
-
-    onMounted(() => {
-        EventPeopleStore.load();
-    });
-
-    const remove = (event: Event) => {
-        eventPeople.deleteEventList(event);
-    };
+  });
+});
 </script>
 
 <style>
     .min-h-screen {
-        background-color: lightblue;
+        background-color: rgb(136, 136, 136);
         color: #111827; 
     }
 
